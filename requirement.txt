@@ -1,0 +1,8 @@
+langchain
+unstructured
+openai
+chromadb
+Cython
+tiktoken
+pandas
+tabulate
