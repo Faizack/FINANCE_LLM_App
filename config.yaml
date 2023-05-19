@@ -1,0 +1,17 @@
+credentials:
+  usernames:
+    admin:
+      email: faijian@bayes.global
+      name: Faijan Khan
+      password: '$2b$12$kaDT9id0e8Br0.8bq4Z4w.enqtmOvgJdw3WPgvylDqhVeXxwxOwn2' # To be replaced with hashed password
+    user:
+      email: jason@bayes.global
+      name: Jason gerg
+      password: '$2b$12$u.52jO01QAbrmx7Nf24J7.EhDSM3ctQuWJTQZ3b7qLzlm8WMTDZwS' # To be replaced with hashed password
+cookie:
+  expiry_days: 0
+  key: some_signature_key # Must be string
+  name: some_cookie_name
+preauthorized:
+  emails:
+  - melsby@gmail.com
