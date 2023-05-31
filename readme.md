@@ -2,5 +2,5 @@
 
 ```
     pip install requriment.txt
-    streamlit run main1.py
+    streamlit run main.py
 ```
