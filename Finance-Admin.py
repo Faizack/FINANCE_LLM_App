@@ -38,6 +38,7 @@ def list_files_in_folder(folder_path):
     return files
 
 def generate_crypto_responses(crypto, start_date, end_date, prompt, key, chat_history, offline_data,selectedfile):
+    # path=f"Online-Data/{crypto}.csv"
     if offline_data:
         # Load data from the offline file
         data = pd.read_csv(f"Offline-Data/{selectedfile}")
@@ -46,7 +47,35 @@ def generate_crypto_responses(crypto, start_date, end_date, prompt, key, chat_hi
         data = yf.download(crypto, start=start_date, end=end_date)
 
         # Write data to a CSV file
+
         data.to_csv(f"Online-Data/{crypto}.csv")
+
+        # Prompt Template
+    template="""You are working with a CSV file in Python. The name of the file is Online-Data/BTC-USD.csv. The file contains information on crypto data. You are able to answer questions about crypto data and should also be able to perform machine learning and time series modeling. You should use the tools below to answer the question posed to you:
+
+            python_repl_ast: A Python shell. Use this to execute python commands. Input should be a valid python command. When using this tool, sometimes output is abbreviated - make sure it does not look abbreviated before using it in your answer.
+
+
+            Please understand csv first and try to do processing on our own.
+
+            Use my dataset for machine learning 
+            Note : Take X as 'Open', 'High', 'Low',"Close', 'Volume' and Y as  'Adj Close' Columns for machine learning prediction and make sure index has date do not add in training process
+
+            Use the following format:
+
+            Question: \n the input question you must answer
+            Thought: \n you should always think about what to do
+            Action: \n the action to take, should be one of [python_repl_ast]
+            Action Input: \n the input to the action
+            Observation: \n the result of the action
+            ... (this Thought/Action/Action Input/Observation can repeat N times)
+            Thought: \n I now know the final answer
+            Final Answer: \n the final answer to the original input question
+
+            This is the result of print(df.head()): {df_head}    
+
+            Begin! Question: {input} {agent_scratchpad}"""
+    
 
     # Create the Langchain agent
     llm = OpenAI(temperature=0, openai_api_key=key)
@@ -55,6 +84,10 @@ def generate_crypto_responses(crypto, start_date, end_date, prompt, key, chat_hi
         f"Offline-Data/{selectedfile}" if offline_data else f"Online-Data/{crypto}.csv",
         verbose=True
     )
+
+    agent.agent.llm_chain.prompt.template=template
+
+
 
     old_stdout = sys.stdout
     redirected_output = sys.stdout = StringIO()
