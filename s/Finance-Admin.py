@@ -36,6 +36,8 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 # from statsmodels.m
 from streamlit import components
+import tensorflow
+
 
 def display_markdown(text):
     display(Markdown(text))
