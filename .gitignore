@@ -1,0 +1,7 @@
+.vscode/
+__pycache__/
+plot/
+save/
+05.agents.ipynb
+crypto.ipynb
+plotting.py

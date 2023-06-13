@@ -1,3 +1,4 @@
+from openai import InvalidRequestError
 import streamlit as st
 import pandas as pd
 import yfinance as yf
@@ -13,8 +14,28 @@ import re
 from IPython.display import Markdown, display
 from openai.error import AuthenticationError,RateLimitError
 from sklearn.linear_model import LinearRegression
-# from statsmodels.m
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF
 
+# all stats model
+
+from statsmodels.tsa.api import  SARIMAX, VAR, VECM
+# from statsmodels.tsa.statespace import (StructTS, DynamicFactor, 
+#                                         MarkovRegression, LocalLevel, LocalLinearTrend)
+from statsmodels.tsa.holtwinters import SimpleExpSmoothing, ExponentialSmoothing
+from statsmodels.tsa.ar_model import AR
+from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.api import OLS
+from sklearn.linear_model import LinearRegression
+
+import pandas as pd
+from langchain.callbacks import get_openai_callback
+import matplotlib
+# matplotlib.use('TkAgg')
+import matplotlib.pyplot as plt
+from datetime import datetime
+# from statsmodels.m
+from streamlit import components
 
 def display_markdown(text):
     display(Markdown(text))
@@ -23,13 +44,30 @@ def display_markdown(text):
 
 # Create a function to display terminal output in the UI
 
-def display_output(output):
+def display_output(output,df):
     cleaned_output = re.sub(r'\x1b\[[0-9;]*m', '', output)
     lines = cleaned_output.strip().split("\n")
     for line in lines:
         if line.startswith("Final Answer:"):
             value = line.split(":")[1].strip()
             st.text(f"Final Answer: {value}")
+        # elif line.startswith("plt.show()"):
+        #     # Get the plot filename
+        #     # Save the plot as an image file
+        #     # timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        #     # plot_filename = f'plot/btc_plot_{timestamp}.png'
+
+        #     # # Save the plot with the generated filename
+        #     # plt.savefig(plot_filename)
+        #     # # Display the saved plot using Streamlit
+        #     # st.image(plot_filename)
+
+        #     # st.pyplot("plt")
+        #     plot_path = 'save/plot.html'
+
+        # # Render the HTML plot in the Streamlit app
+        #     st.components.v1.html(open(plot_path, 'r').read(), width=800, height=600)
+
         else:
             st.text(line)
 
@@ -50,59 +88,100 @@ def generate_crypto_responses(crypto, start_date, end_date, prompt, key, chat_hi
 
         data.to_csv(f"Online-Data/{crypto}.csv")
 
-        # Prompt Template
-    template="""You are working with a CSV file in Python. The name of the file is Online-Data/BTC-USD.csv. The file contains information on crypto data. You are able to answer questions about crypto data and should also be able to perform machine learning and time series modeling. You should use the tools below to answer the question posed to you:
 
-            python_repl_ast: A Python shell. Use this to execute python commands. Input should be a valid python command. When using this tool, sometimes output is abbreviated - make sure it does not look abbreviated before using it in your answer.
+        template="""
+
+        You are working with a CSV file in Python that contains cryptocurrency data. The file name is {db}, and you should use the 'Date' column as the index when loading the data. Your task is to analyze the cryptocurrency data and answer questions related to it. You have access to various tools and libraries to assist you, including machine learning and time series modeling.
 
 
-            Please understand csv first and try to do processing on our own.
+        python_repl_ast: A Python shell. Use this to execute python commands. Input should be a valid python command. When using this tool, sometimes output is abbreviated - make sure it does not look abbreviated before using it in your answer.
 
-            Use my dataset for machine learning 
-            Note : Take X as 'Open', 'High', 'Low',"Close', 'Volume' and Y as  'Adj Close' Columns for machine learning prediction and make sure index has date do not add in training process
+        To make your visualizations colorful and attractive, consider the following tips:
+        - Choose vibrant and contrasting colors for different elements in your plots.
+        - Experiment with different marker styles and line styles.
+        - Customize the background, grid, and text styling to enhance visual appeal.
+        - Pay attention to the layout and composition of your plots.
 
-            Use the following format:
+        
+        To help you accomplish the task, here are some guidelines:
 
-            Question: \n the input question you must answer
-            Thought: \n you should always think about what to do
-            Action: \n the action to take, should be one of [python_repl_ast]
-            Action Input: \n the input to the action
-            Observation: \n the result of the action
-            ... (this Thought/Action/Action Input/Observation can repeat N times)
-            Thought: \n I now know the final answer
-            Final Answer: \n the final answer to the original input question
+        - Familiarize yourself with the structure of the CSV file and the data it contains.
+        - Take a hands-on approach to data processing and manipulation.
+        - Ensure your code is free of syntax errors.
+        - For machine learning tasks, use the provided dataset.
+        - Use the following columns as features (X) for machine learning prediction: 'Open', 'High', 'Low', 'Close', 'Volume'. The target variable (Y) is 'Adj Close'. Exclude the 'Date' column from the training process.
 
-            This is the result of print(df.head()): {df_head}    
 
-            Begin! Question: {input} {agent_scratchpad}"""
-    
+
+        When visualizations are required, always utilize the 'plotly.graph_objects' library for plotting. Apply the tips mentioned earlier to create colorful and attractive plots. Use the `fig.show()` command to display the diagrams.
+
+        fig.show()  # Display the diagram
+
+        For machine learning tasks, the following libraries are available:
+        1. LSTM and GRU from 'tensorflow.keras.layers'
+        2. SARIMAX, VAR, and VECM from 'statsmodels.tsa.api'
+        3. SimpleExpSmoothing and ExponentialSmoothing from 'statsmodels.tsa.holtwinters'
+        4. AR from 'statsmodels.tsa.ar_model'
+        5. seasonal_decompose from 'statsmodels.tsa.seasonal'
+
+
+        Use the following format:
+
+        Question:  the input question you must answer
+        Thought:  you should always think about what to do
+        Action:  the action to take, should be one of [python_repl_ast]
+        Action Input:  the input to the action
+        Observation:  the result of the action
+        ... (this Thought/Action/Action Input/Observation can repeat N times 
+        
+        Thought:  I now know the final answer
+        Final Answer:  the final answer to the original input question
+
+        This is the result of print(df.head()): {df_head}    
+
+        Begin! Question: {input} {agent_scratchpad}"""
 
     # Create the Langchain agent
     llm = OpenAI(temperature=0, openai_api_key=key)
     agent = create_csv_agent(
         llm,
-        f"Offline-Data/{selectedfile}" if offline_data else f"Online-Data/{crypto}.csv",
-        verbose=True
+        f"Offline-Data/{selectedfile}" if offline_data else f"Online-Data/{crypto}.csv",verbose=True
     )
+            # Prompt Template
 
-    agent.agent.llm_chain.prompt.template=template
+    # agent.agent.llm_chain.prompt.input_variables.append('db')
+    # print('input :', agent.agent.llm_chain.prompt.input_variables)
+  
 
 
+
+
+    if not offline_data:
+        agent.agent.llm_chain.prompt.template=template
+
+
+    # print("prompt",(agent.agent.llm_chain.prompt.template))
 
     old_stdout = sys.stdout
     redirected_output = sys.stdout = StringIO()
     # Run the agent to generate a response based on the user's prompt
-    response = agent.run(prompt)
-    agent.memory
+    if not offline_data:
+        data = f"Online-Data/{crypto}.csv"
+        print("file", data)
+        agent.agent.llm_chain.prompt.input_variables.append('db')
+        print('input :', agent.agent.llm_chain.prompt.input_variables)
+        response = agent.run({'input': prompt,"db":data})
+    else :
+        response = agent.run({'input': prompt})
 
     # Restore stdout and display the captured output in the UI
     sys.stdout = old_stdout
     output = redirected_output.getvalue()
     with st.expander("**Detail AI Calculation**"):
-        (display_output(output))
+        (display_output(output, data))
     chat_history.append((prompt, response))
 
-    return response,output
+    return response, output
 
 def display_chat_history(chat_history):
     for i, (question, answer) in enumerate(chat_history):
@@ -128,7 +207,7 @@ def main():
 
     with st.sidebar.expander("API Key Input"):
         with st.form(key="api_form"):
-            api_key = st.text_input("Enter your OpenAI API key:", type="password")
+            api_key = st.text_input("Enter your API key:", type="password")
             submit_button = st.form_submit_button(label="Submit")
 
             if submit_button and api_key:

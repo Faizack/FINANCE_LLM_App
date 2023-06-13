@@ -1,3 +1,4 @@
+from openai import InvalidRequestError
 import streamlit as st
 import pandas as pd
 import yfinance as yf
@@ -10,6 +11,7 @@ import os
 from IPython.display import Markdown, display
 from openai.error import AuthenticationError,RateLimitError
 from sklearn.linear_model import LinearRegression
+from langchain.callbacks import get_openai_callback
 
 def list_files_in_folder(folder_path):
     files = os.listdir(folder_path)
@@ -34,11 +36,15 @@ def generate_crypto_responses(crypto, start_date, end_date, prompt, key, chat_hi
         verbose=True
     )
 
+    try :
+        with get_openai_callback() as cb:
     # Run the agent to generate a response based on the user's prompt
-    response = agent.run(prompt)
-    chat_history.append((prompt, response))
+            response = agent.run(prompt)
+            chat_history.append((prompt, response))
 
-    return response
+            return response
+    except InvalidRequestError:
+        st.write("Max Token error. Give Prompting properly")    
 
 def display_chat_history(chat_history):
     for i, (question, answer) in enumerate(chat_history):
