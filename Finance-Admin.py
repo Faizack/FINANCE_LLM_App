@@ -165,23 +165,27 @@ def generate_crypto_responses(crypto, start_date, end_date, prompt, key, chat_hi
     old_stdout = sys.stdout
     redirected_output = sys.stdout = StringIO()
     # Run the agent to generate a response based on the user's prompt
-    if not offline_data:
-        data = f"Online-Data/{crypto}.csv"
-        print("file", data)
-        agent.agent.llm_chain.prompt.input_variables.append('db')
-        print('input :', agent.agent.llm_chain.prompt.input_variables)
-        response = agent.run({'input': prompt,"db":data})
-    else :
-        response = agent.run({'input': prompt})
+    try :
+        with get_openai_callback() as cb:
+            if not offline_data:
+                data = f"Online-Data/{crypto}.csv"
+                print("file", data)
+                agent.agent.llm_chain.prompt.input_variables.append('db')
+                print('input :', agent.agent.llm_chain.prompt.input_variables)
+                response = agent.run({'input': prompt,"db":data})
+            else :
+                response = agent.run({'input': prompt})
 
-    # Restore stdout and display the captured output in the UI
-    sys.stdout = old_stdout
-    output = redirected_output.getvalue()
-    with st.expander("**Detail AI Calculation**"):
-        (display_output(output, data))
-    chat_history.append((prompt, response))
+            # Restore stdout and display the captured output in the UI
+            sys.stdout = old_stdout
+            output = redirected_output.getvalue()
+            with st.expander("**Detail AI Calculation**"):
+                (display_output(output, data))
+            chat_history.append((prompt, response))
 
-    return response, output
+            return response, output
+    except InvalidRequestError:
+        st.write("Max Token error. Give Prompting properly") 
 
 def display_chat_history(chat_history):
     for i, (question, answer) in enumerate(chat_history):
