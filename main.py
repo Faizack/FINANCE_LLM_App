@@ -46,11 +46,11 @@ def main():
 
         if username == "admin":
 
-            execute_script('Finance-Admin.py')
+            execute_script('s/Finance-Admin.py')
                     
         if username == "user":
 
-            execute_script('Finance-User.py')
+            execute_script('s/Finance-User.py')
                     
     elif authentication_status == False:
         st.error("Username/password is incorrect")
