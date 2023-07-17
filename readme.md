@@ -7,7 +7,8 @@
 **Screenshot**
 
 Home :
-![Image Description](Finazlyer_Assets\Home-Page.png)
+![Home](https://github.com/Faizack/Finlyzr_App/tree/main/Finazlyer_Assets/Home-Page.png)
+
 
 
 Select Data :
