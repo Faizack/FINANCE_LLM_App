@@ -12,14 +12,14 @@ Home :
 
 
 Select Data :
-![Image Description](Finazlyer_Assets\Select_Data-Page_2.png)
+![Image Description](Finazlyer_Assets/Select_Data-Page_2.png)
 
 Result From Question :
 1 :
-![Image Description](Finazlyer_Assets\Example-Page-4.png)
+![Image Description](Finazlyer_Assets/Example-Page-4.png)
 
 2 :
-![Image Description](Finazlyer_Assets\Example-Page-5.png)
+![Image Description](Finazlyer_Assets/Example-Page-5.png)
 
 
 
