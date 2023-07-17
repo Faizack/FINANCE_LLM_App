@@ -1,5 +1,31 @@
 **Crypto Currency App**
 
+**Description**:
+`   Finlyzr is a financial data assistant powered by AI. It allows users to either upload CSV files for Crytocurrency or download CSV files by specifying a date range. With the help of these CSV files, users can ask questions related to the data.`
+
+
+**Screenshot**
+
+Home :
+![Image Description](Finazlyer_Assets\Home-Page.png)
+
+
+Select Data :
+![Image Description](Finazlyer_Assets\Select_Data-Page_2.png)
+
+Result From Question :
+1 :
+![Image Description](Finazlyer_Assets\Example-Page-4.png)
+
+2 :
+![Image Description](Finazlyer_Assets\Example-Page-5.png)
+
+
+
+
+Description :
+
+
 This is a cryptocurrency analysis and trading application built using OpenAI and Langchain. The app provides features for both traders and investors to analyze and trade various cryptocurrencies.
 
 Installation:
