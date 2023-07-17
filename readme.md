@@ -1,6 +1,7 @@
 **Crypto Currency App**
 
 **Description**:
+<br>
 `   Finlyzr is a financial data assistant powered by AI. It allows users to either upload CSV files for Crytocurrency or download CSV files by specifying a date range. With the help of these CSV files, users can ask questions related to the data.`
 
 
