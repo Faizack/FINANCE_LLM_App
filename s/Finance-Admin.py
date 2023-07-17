@@ -36,8 +36,6 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 # from statsmodels.m
 from streamlit import components
-import tensorflow
-
 
 def display_markdown(text):
     display(Markdown(text))
@@ -53,22 +51,22 @@ def display_output(output,df):
         if line.startswith("Final Answer:"):
             value = line.split(":")[1].strip()
             st.text(f"Final Answer: {value}")
-        # elif line.startswith("plt.show()"):
-        #     # Get the plot filename
-        #     # Save the plot as an image file
-        #     # timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        #     # plot_filename = f'plot/btc_plot_{timestamp}.png'
+        elif line.startswith("fig.show()"):
+            # Get the plot filename
+            # Save the plot as an image file
+            timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+            plot_filename = f'plot/btc_plot_{timestamp}.html'
 
-        #     # # Save the plot with the generated filename
-        #     # plt.savefig(plot_filename)
-        #     # # Display the saved plot using Streamlit
-        #     # st.image(plot_filename)
+            # Save the plot with the generated filename
+            plt.savefig(plot_filename)
+            # # Display the saved plot using Streamlit
+            # st.image(plot_filename)
 
-        #     # st.pyplot("plt")
-        #     plot_path = 'save/plot.html'
+            # st.pyplot("plt")
+            # plot_path = 'save/plot.html'
 
-        # # Render the HTML plot in the Streamlit app
-        #     st.components.v1.html(open(plot_path, 'r').read(), width=800, height=600)
+        # Render the HTML plot in the Streamlit app
+            st.components.v1.html(open( plot_filename, 'r').read(), width=800, height=600)
 
         else:
             st.text(line)
